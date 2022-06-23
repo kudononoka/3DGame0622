@@ -26,7 +26,7 @@ public class PlayerAttack : MonoBehaviour
         if (other.gameObject.CompareTag("Enemy") )
         {
                 enemyMove.EnemyDamage(20);
-                playerManager.Mp(20);
+                playerManager.Sp(20);
         }
     }
 

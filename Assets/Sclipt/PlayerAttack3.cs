@@ -23,7 +23,7 @@ public class PlayerAttack3 : MonoBehaviour
         if(other.gameObject.CompareTag("Enemy2"))
         {
                 enemy2.EnemyDamage(20);
-                playerManager.Mp(20);
+                playerManager.Sp(20);
         }
     }
 }

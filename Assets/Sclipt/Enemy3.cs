@@ -5,7 +5,7 @@ using UnityEngine.AI;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(NavMeshAgent))]
-public class Enemy3 : MonoBehaviour
+public class Enemy3 : MonoBehaviour　//EnemyMoveと同一
 {
     private NavMeshAgent _nav;
     private Rigidbody _rb;

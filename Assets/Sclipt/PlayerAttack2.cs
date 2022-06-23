@@ -24,7 +24,7 @@ public class PlayerAttack2 : MonoBehaviour
         if (other.gameObject.CompareTag("Boss"))
         {
             bossController.EnemyDamage(20);
-            playerManager.Mp(20);
+            playerManager.Sp(20);
         }
     }
 }

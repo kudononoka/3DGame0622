@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//スライダーを常にカメラの向きと同じにする
 public class HPRotate : MonoBehaviour
 {
     private RectTransform _rotate;

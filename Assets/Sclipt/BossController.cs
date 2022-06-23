@@ -118,11 +118,11 @@ public class BossController : MonoBehaviour
             _rotatetime += Time.deltaTime;
 
 
-            if (_rotatetime < 1.1f)
+            if (_rotatetime < 1.1f) //攻撃前の動作
             {
                 transform.Rotate(Vector3.down * Time.deltaTime * 200f);
             }
-            else if (_rotatetime < 2f)
+            else if (_rotatetime < 2f)　//攻撃
             {
                 _attack2.enabled = true;
                 _audio2.enabled = true;
@@ -164,18 +164,7 @@ public class BossController : MonoBehaviour
         _attack.enabled = false;
         _audio.enabled = false;
     }
-    /*public void Onattack2()
-    {
-        _attack2.enabled = true;
-        _audio2.enabled = true;
-    }
-
-    public void Offattack2()
-    {
-        _attack2.enabled = false;
-        _audio2.enabled= false;
-    }*/
-
+    
     public void OnAudio()
     {
         _audio3.enabled = true;

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//スライダーを常にカメラの向きと同じにする
+//プレイヤーの後ろに常にカメラを配置
 public class HPvar : MonoBehaviour
 {
     private RectTransform _rotate;

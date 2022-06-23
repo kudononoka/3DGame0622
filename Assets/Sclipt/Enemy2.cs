@@ -5,10 +5,9 @@ using UnityEngine.AI;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(NavMeshAgent))]
-public class Enemy2 : MonoBehaviour
+public class Enemy2 : MonoBehaviour　  //EnemyMoveと同一
 {
     private NavMeshAgent _nav;
-    private Rigidbody _rb;
     private Animator _anim;
     public Transform _player;
     private float _time;
@@ -29,7 +28,6 @@ public class Enemy2 : MonoBehaviour
     {
         _hp.maxValue = _maxHP;
         _hp.value = _nowHP;
-        _rb = GetComponent<Rigidbody>();
         _anim = GetComponent<Animator>();
         _player = GameObject.FindGameObjectWithTag("Player").GetComponent<Transform>();
         _nav = GetComponent<NavMeshAgent>();
