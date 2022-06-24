@@ -30,7 +30,7 @@ public class PlayerManager : MonoBehaviour
     private bool _spAction = false; //必殺技
     public bool _spNo = false; 
     private bool _avoid = false; //回避
-    private float _avoidtime = 0; //
+    private float _avoidtime = 0; 
    
 
     [SerializeField] GameObject _canvas;
