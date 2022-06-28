@@ -2,9 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+////////////////////   攻撃　プレイヤーのSP増減と敵へのダメージ   /////////////////////////
+
+
 public class PlayerAttack : MonoBehaviour
 {
     [SerializeField] EnemyMove enemyMove;
+    [SerializeField] Enemy2 enemy2;
+    [SerializeField] Enemy3 enemy3;
+    [SerializeField] BossController bossController;
     [SerializeField] PlayerManager playerManager;
 
     
@@ -27,6 +34,21 @@ public class PlayerAttack : MonoBehaviour
         {
                 enemyMove.EnemyDamage(20);
                 playerManager.Sp(20);
+        }
+        if (other.gameObject.CompareTag("Boss"))
+        {
+            bossController.EnemyDamage(20);
+            playerManager.Sp(20);
+        }
+        if (other.gameObject.CompareTag("Enemy2"))
+        {
+            enemy2.EnemyDamage(20);
+            playerManager.Sp(20);
+        }
+        if (other.gameObject.CompareTag("Enemy3"))
+        {
+            enemy3.EnemyDamage(20);
+            playerManager.Sp(20);
         }
     }
 

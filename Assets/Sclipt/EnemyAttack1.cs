@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+///////////////////////////// 攻撃  プレイヤーへのダメージ　/////////////////////////////////
+
 public class EnemyAttack1 : MonoBehaviour
 {
     [SerializeField] PlayerManager _playerManager;

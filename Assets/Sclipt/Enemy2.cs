@@ -4,8 +4,11 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
 
+
+///////////////////////////   EnemyMoveスクリプトと同一  ////////////////////////////
+
 [RequireComponent(typeof(NavMeshAgent))]
-public class Enemy2 : MonoBehaviour　  //EnemyMoveと同一
+public class Enemy2 : MonoBehaviour　  
 {
     private NavMeshAgent _nav;
     private Animator _anim;
@@ -20,6 +23,7 @@ public class Enemy2 : MonoBehaviour　  //EnemyMoveと同一
     public bool _die = false;
     [SerializeField] AudioSource _audio;
     [SerializeField] AudioSource _audio2;
+    private float _angle = 10;
 
 
 
@@ -42,24 +46,33 @@ public class Enemy2 : MonoBehaviour　  //EnemyMoveと同一
         _time += Time.deltaTime;
         if ((Vector3.Distance(transform.position, _player.transform.position)) < 2.5)
         {
-            if (_time > 4)
+            var diff = _player.transform.position - transform.position;
+            var angle = Vector3.Angle(transform.forward, diff);
+            if (angle <= _angle)
             {
-                enemyAttackInterval = Random.Range(0, 10);
-                if (enemyAttackInterval > 8)
+                if (_time > 4)
                 {
-                    _anim.SetTrigger("3conbo");
-                    _time = 0;
+                    enemyAttackInterval = Random.Range(0, 10);
+                    if (enemyAttackInterval > 8)
+                    {
+                        _anim.SetTrigger("3conbo");
+                        _time = 0;
+                    }
+                    else if (enemyAttackInterval > 4)
+                    {
+                        _anim.SetTrigger("2Attack");
+                        _time = 0;
+                    }
+                    else if (enemyAttackInterval > 0)
+                    {
+                        _anim.SetTrigger("1Attack");
+                        _time = 0;
+                    }
                 }
-                else if (enemyAttackInterval > 4)
-                {
-                    _anim.SetTrigger("2Attack");
-                    _time = 0;
-                }
-                else if (enemyAttackInterval > 0)
-                {
-                    _anim.SetTrigger("1Attack");
-                    _time = 0;
-                }
+            }
+            else　
+            {
+                transform.Rotate(Vector3.up * Time.deltaTime * 100f);
             }
         }
         if ((Vector3.Distance(transform.position, _player.transform.position)) < 7)

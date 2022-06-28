@@ -7,41 +7,74 @@ using UnityEngine.UI;
 [RequireComponent(typeof(NavMeshAgent))]
 public class BossController : MonoBehaviour
 {
+    ///<summary>NavMeshAgentコンポーネント</summary>
     private NavMeshAgent _nav;
-    private Rigidbody _rb;
+    /// <summary>ボス敵のアニメーター</summary>
     private Animator _anim;
-    public Transform _player;
-    public float _time;
-    public float enemyAttackInterval;
-    public Slider _hp;
-    private float _maxHP = 350;
-    private float _nowHP = 350;
+    /// <summary>プレイヤーの位置</summary>
+    [SerializeField] Transform _player;
+
+
+    //////////////////////////  攻撃　///////////////////////////////////
+
+    /// <summary>攻撃ダメージ判定のコライダー　ボス敵の角に設置</summary>
     private BoxCollider _attack;
-    private CapsuleCollider _attack2;
-    private float _angle = 180;
-    private bool _die = false;
-    private float _dietime = 0;
+    /// <summary>攻撃ダメージ判定のコライダー　回転攻撃</summary>
+    private CapsuleCollider _attackRotate;
+    /// <summary>攻撃までのカウントダウン</summary>
+    private float _attackTime;
+    /// <summary>攻撃開始 4</summary>
+    private float _attackPlay = 4;
+    /// <summary>攻撃の種類分け</summary>
+    public float enemyAttackInterval;
+
+    /// <summary>回転攻撃判定</summary>
     private bool _rotate = false;
+    /// <summary>回転攻撃の予備動作の制限時間 1.1</summary>
+    private float _rotatePreparation = 1.1f;
+    /// <summary>回転攻撃の制限時間 2</summary>
+    private float _rotateAttackPlay = 2f;
+    /// <summary>攻撃開始から攻撃終了までの時間</summary>
     private float _rotatetime = 0;
 
-    [SerializeField] GameObject canvas;
-    [SerializeField] AudioSource _audio;
-    [SerializeField] AudioSource _audio2;
-    [SerializeField] AudioSource _audio3;
+    /// <summary>通常攻撃音</summary>
+    [SerializeField] AudioSource _attackAudio;
+    /// <summary>回転攻撃音</summary>
+    [SerializeField] AudioSource _rotateAttackAudio;
 
+    //////////////////////////////////////////////////////////////////////
+
+
+    /// <summary>HPのスライダー</summary>
+    [SerializeField] Slider _hp;
+    /// <summary>HPの最大値 350</summary>
+    private float _maxHP = 350;
+    /// <summary>現在のHP </summary>
+    private float _nowHP = 350;
+    /// <summary>視覚　180度</summary>
+    private float _angle = 100;
+    /// <summary>死判定</summary>
+    private bool _die = false;
+    /// <summary>ゲームクリアのキャンバス表示までのカウントダウン</summary>
+    private float _dietime = 0;
+    /// <summary>鳴き声</summary>
+    [SerializeField] AudioSource _roar;
+
+    /// <summary>ゲームクリア時のキャンバス</summary>
+    [SerializeField] GameObject canvas;
+    
 
     // Start is called before the first frame update
     void Start()
     {
         _hp.maxValue = _maxHP;
         _hp.value = _nowHP;
-        _rb = GetComponent<Rigidbody>();
         _anim = GetComponent<Animator>();
         _player = GameObject.FindGameObjectWithTag("Player").GetComponent<Transform>();
         _nav = GetComponent<NavMeshAgent>();
         enemyAttackInterval = Random.Range(0, 10);
         _attack = GameObject.Find("BossAttack").GetComponent<BoxCollider>();
-        _attack2 = GameObject.Find("RotateAttack").GetComponent<CapsuleCollider>();
+        _attackRotate = GameObject.Find("RotateAttack").GetComponent<CapsuleCollider>();
     }
 
     // Update is called once per frame
@@ -58,83 +91,74 @@ public class BossController : MonoBehaviour
             }
         }
 
-        _time += Time.deltaTime;
+        _attackTime += Time.deltaTime;
         if ((Vector3.Distance(transform.position, _player.transform.position)) < 7)
         {
             var playerdistance = _player.transform.position - this.transform.position;
             var angle = Vector3.Angle(playerdistance, this.transform.forward);
             if (angle <= _angle)
             {
-                if (_time > 4)
+                if (_attackTime > _attackPlay)
                 {
                     enemyAttackInterval = Random.Range(0, 10);
                     if (enemyAttackInterval > 7)
                     {
                         _rotate = true;
-                        
+
                     }
                     else if (enemyAttackInterval > 5)
                     {
                         _anim.SetTrigger("3conbo");
-                        _time = 0;
+                        _attackTime = 0;
                     }
                     else if (enemyAttackInterval > 3)
                     {
                         _anim.SetTrigger("2Attack");
-                        _time = 0;
+                        _attackTime = 0;
                     }
                     else if (enemyAttackInterval > 0)
                     {
                         _anim.SetTrigger("1Attack");
-                        _time = 0;
+                        _attackTime = 0;
                     }
                 }
             }
-            if ((Vector3.Distance(transform.position, _player.transform.position)) < 11)
-            {
-                _anim.SetFloat("walk", _nav.velocity.magnitude);
-                _nav.SetDestination(_player.transform.position);
+        }
+        if ((Vector3.Distance(transform.position, _player.transform.position)) < 11)
+        {
+            _anim.SetFloat("walk", _nav.velocity.magnitude);
+            _nav.SetDestination(_player.transform.position);
 
-            }
-            else
-            {
-                _nav.SetDestination(this.transform.position);
-                _anim.SetFloat("walk", 0f);
-            }
         }
         else
         {
-            if(_time > 4)
-            {
-                _anim.SetTrigger("Angle");
-                float y = transform.rotation.eulerAngles.y;
-                transform.rotation = Quaternion.Euler(0, y, 0);
-                _time = 0;
-            }
+            _nav.SetDestination(this.transform.position);
+            _anim.SetFloat("walk", 0f);
         }
+        
 
         if(_rotate)
         {
             _rotatetime += Time.deltaTime;
 
 
-            if (_rotatetime < 1.1f) //攻撃前の動作
+            if (_rotatetime < _rotatePreparation)
             {
                 transform.Rotate(Vector3.down * Time.deltaTime * 200f);
             }
-            else if (_rotatetime < 2f)　//攻撃
+            else if (_rotatetime < _rotateAttackPlay)　
             {
-                _attack2.enabled = true;
-                _audio2.enabled = true;
+                _attackRotate.enabled = true;
+                _rotateAttackAudio.enabled = true;
                 transform.Rotate(Vector3.up * Time.deltaTime * 600f);
             }
             else
             {
-                _attack2.enabled=false;
-                _audio2.enabled = false;
+                _attackRotate.enabled=false;
+                _rotateAttackAudio.enabled = false;
                 _rotate = false;
                 _rotatetime = 0;
-                _time = 0;
+                _attackTime = 0;
             }
         }
 
@@ -151,28 +175,34 @@ public class BossController : MonoBehaviour
         }
 
     }
+    
 
+    ////////////////////　攻撃アニメーションのイベント  /////////////////////////
+    
     public void Onattack()
     {
 
         _attack.enabled = true;
-        _audio.enabled = true;
+        _attackAudio.enabled = true;
     }
 
     public void Offattack()
     {
         _attack.enabled = false;
-        _audio.enabled = false;
+        _attackAudio.enabled = false;
     }
+
+    /////////////////////////////////////////////////////////////////////////////
+    
     
     public void OnAudio()
     {
-        _audio3.enabled = true;
+        _roar.enabled = true;
     }
 
     public void OffAudio()
     {
-        _audio3.enabled = false;
+        _roar.enabled = false;
     }
 
 }

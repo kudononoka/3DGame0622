@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+//////////////////        ボスステージ前の壁　        /////////////////////
+//////////////////  エリア内の敵３匹倒すと壁が消える  /////////////////////
+
 public class Wall : MonoBehaviour
 {
     [SerializeField] EnemyMove enemyMove;

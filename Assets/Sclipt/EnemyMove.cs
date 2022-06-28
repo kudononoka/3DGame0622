@@ -7,63 +7,85 @@ using UnityEngine.UI;
 [RequireComponent(typeof(NavMeshAgent))]
 public class EnemyMove : MonoBehaviour
 {
+    /// <summary>NavMeshAgentコンポーネント</summary>
     private NavMeshAgent _nav;
+    /// <summary>敵のアニメーター</summary>
     private Animator _anim;
+    /// <summary>プレイヤーの位置</summary>
     [SerializeField] Transform _player;
-    private float _time; 
-    private float _dietime = 0;
-    public float enemyAttackInterval; 
-    [SerializeField] Slider _hp;
-    private float _maxHP = 200;　//HP最大値
-    private float _nowHP = 200;　//現在のHP
-    private BoxCollider _attack;　//攻撃時のコライダー
-    public bool _die = false;
-    [SerializeField] AudioSource _audio; //攻撃音
-    [SerializeField] AudioSource _audio2;　//鳴き声
-    private float _angle = 10;
 
+
+    ////////////////////////////// 攻撃 //////////////////////////////////
+    
+    /// <summary>攻撃ダメージ判定のコライダー　敵の角に設置</summary>
+    private BoxCollider _attack;
+    /// <summary>攻撃開始までのカウントダウン</summary>
+    private float _attackTime;
+    /// <summary>攻撃開始 4</summary>
+    private float _attackPlay = 4;
+    /// <summary>攻撃の種類分け</summary>
+    public float enemyAttackInterval;
+    /// <summary>攻撃音</summary>
+    [SerializeField] AudioSource _attackAudio;
+
+    //////////////////////////////////////////////////////////////////////
+    
+
+    /// <summary>敵のスライダー</summary>
+    [SerializeField] Slider _hp;
+    /// <summary>HPの最大値 200</summary>
+    private float _maxHP = 200;
+    /// <summary>現在のHP </summary>
+    private float _nowHP = 200;
+    /// <summary>死判定</summary>
+    public bool _die = false;
+    private float _dietime = 0;
+    /// <summary> 鳴き声</summary>
+    [SerializeField] AudioSource _roar;　
+    /// <summary>視覚　10度</summary>
+    private float _angle = 10;
 
 
     // Start is called before the first frame update
     void Start()
     {
-        _hp.maxValue = _maxHP;　//スライダーの最大値200
-        _hp.value = _nowHP;　//最初のHP200をスライダーに反映
+        _hp.maxValue = _maxHP;　
+        _hp.value = _nowHP;　
         _anim = GetComponent<Animator>();
-        _player = GameObject.FindGameObjectWithTag("Player").GetComponent<Transform>(); //プレイヤーの位置を取得
+        _player = GameObject.FindGameObjectWithTag("Player").GetComponent<Transform>(); 
         _nav = GetComponent<NavMeshAgent>();
         enemyAttackInterval = Random.Range(0, 10);
-        _attack = GameObject.Find("enemyAttack").GetComponent<BoxCollider>();　//プレイヤーに与えるダメージのコライダー取得
+        _attack = GameObject.Find("enemyAttack").GetComponent<BoxCollider>();　
     }
 
     // Update is called once per frame
     void Update()
     {
        
-        _time += Time.deltaTime;
+        _attackTime += Time.deltaTime;
         if((Vector3.Distance(transform.position, _player.transform.position)) < 2.5) 
         {
-            var diff = _player.transform.position - transform.position; //敵からプレイヤーまでのベクトル(ベクトルA)取得
-            var angle = Vector3.Angle(transform.forward, diff);　//敵の前方のベクトルとベクトルAの角度取得
+            var diff = _player.transform.position - transform.position; 
+            var angle = Vector3.Angle(transform.forward, diff);　
             if (angle <= _angle)　
             {
-                if (_time > 4)　//4秒ごとに攻撃
+                if (_attackTime > _attackPlay)　
                 {
                     enemyAttackInterval = Random.Range(0, 10);
                     if (enemyAttackInterval > 8)
                     {
                         _anim.SetTrigger("3conbo");
-                        _time = 0;
+                        _attackTime = 0;
                     }
                     else if (enemyAttackInterval > 4)
                     {
                         _anim.SetTrigger("2Attack");
-                        _time = 0;
+                        _attackTime = 0;
                     }
                     else if (enemyAttackInterval > 0)
                     {
                         _anim.SetTrigger("1Attack");
-                        _time = 0;
+                        _attackTime = 0;
                     }
                 }
             }
@@ -76,7 +98,7 @@ public class EnemyMove : MonoBehaviour
         {
             _anim.SetFloat("walk", _nav.velocity.magnitude);
             _nav.SetDestination(_player.transform.position);
-            if (_die)　//関連：行103
+            if (_die)　
             {
                 _anim.SetTrigger("Die");
                 _nav.SetDestination(this.transform.position);
@@ -98,32 +120,36 @@ public class EnemyMove : MonoBehaviour
     {
         _nowHP -= enemydamage;　 
         _hp.value = _nowHP;　
-        if(_hp.value <= 0)  //HPが０の時　行81に反映
+        if(_hp.value <= 0)  
         {
             _die = true;
         }
     }
 
-
-    public void Onattack()　//攻撃アニメーションイベント//ダメージを与えるコライダーを表示
+    
+    /////////////////// 攻撃アニメーションイベント //////////////////////////
+    
+    public void Onattack()　
     {
         
         _attack.enabled = true;
-        _audio.enabled = true;
+        _attackAudio.enabled = true;
     }
 
-    public void Offattack()　//非表示
+    public void Offattack()　
     {
         _attack.enabled = false;
-        _audio.enabled = false;
+        _attackAudio.enabled = false;
     }
 
-    public void OnAudio()　//鳴き声//表示
+    ////////////////////////////////////////////////////////////////////////
+
+    public void OnAudio()　
     {
-        _audio2.enabled = true;
+        _roar.enabled = true;
     }
-    public void OffAudio()　//非表示
+    public void OffAudio()　
     {
-        _audio2.enabled = false;
+        _roar.enabled = false;
     }
 }

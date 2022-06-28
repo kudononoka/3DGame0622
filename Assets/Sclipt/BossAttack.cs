@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+///////////////////////////// 攻撃  プレイヤーへのダメージ　/////////////////////////////////
+
 public class BossAttack : MonoBehaviour
 {
     [SerializeField] PlayerManager playerManager;

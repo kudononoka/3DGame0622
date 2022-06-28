@@ -5,47 +5,73 @@ using UnityEngine.UI;
 
 public class PlayerManager : MonoBehaviour
 {
-    public Ground ground;　//接地判定のスクリプト取得
-    private Animator _anim = null;　//アニメーター
-    private Rigidbody _rb = null;　//重力
-    private bool isGround = false; //接地判定
+    /// <summary>接地判定のスクリプト</summary>
+    [SerializeField] Ground ground;　
+    /// <summary>プレイヤーのアニメーター</summary>
+    private Animator _anim = null;　
+    /// <summary>重力</summary>
+    private Rigidbody _rb = null;　
+    /// <summary>接地判定</summary>
+    private bool isGround = false; 
    
     
+    ////////////////////////////　攻撃　//////////////////////////////
     
-    private Collider _attack;　//攻撃
-    private Collider _attack2;
-    [SerializeField] GameObject _effect;　//攻撃時のパーティカル
-    [SerializeField] GameObject _effect2;
-    [SerializeField] AudioSource _audio;　//攻撃時の音
-    [SerializeField] AudioSource _audio2;
+    /// <summary>攻撃ダメージ判定のコライダー　左手の刀に設置</summary>
+    private Collider _leftAttack;
+    /// <summary>攻撃ダメージ判定のコライダー　右手の刀に設置</summary>
+    private Collider _rigthAttack;
+    /// <summary>攻撃時のパーティカル 左手</summary>
+    [SerializeField] GameObject _leftPartical;
+    /// <summary>攻撃時のパーティカル 右手</summary>
+    [SerializeField] GameObject _rigthPartical;
+    /// <summary>攻撃音　左手</summary>
+    [SerializeField] AudioSource _leftaudio;　
+    /// <summary>攻撃音　右手</summary>
+    [SerializeField] AudioSource _rigthaudio;
+
+    //////////////////////////////////////////////////////////////////
 
 
-    private float walkSpeed = 5f; //歩く速度
-    private float _maxHP = 200f;　//HPの最大値
-    private float _nowHP = 200f;  //現在のHP
-    public Slider slider;　//HP用のスライダー取得
-    [SerializeField] Slider _mpSlider;　//SP用のスライダー取得
-    private float _maxMP = 100;　//SPの最大値
-    private float _nowMP = 0; //最初のSPを0に
-    private bool _spAction = false; //必殺技
-    public bool _spNo = false; 
-    private bool _avoid = false; //回避
-    private float _avoidtime = 0; 
+    /// <summary>歩く速度</summary>
+    private float walkSpeed = 5f;
+    /// <summary>HPの最大値  200</summary>
+    private float _maxHP = 200f;
+    /// <summary>現在のHP</summary>
+    private float _nowHP = 200f;
+    /// <summary>HP用のスライダー</summary>
+    [SerializeField] Slider _hpSlider;
+    /// <summary>SP用のスライダー</summary>
+    [SerializeField] Slider _spSlider;
+    /// <summary>SPの最大値 100</summary>
+    private float _maxSP = 100;
+    /// <summary>最初のSPを0に</summary>
+    private float _nowSP = 0;
+    /// <summary>必殺技判定</summary>
+    private bool isSpAction = false;
+    /// <summary>攻撃してもSPは0に</summary>
+    public bool isSpValue0 = false;
+    /// <summary>回避判定</summary>
+    private bool isAvoid = false; 
+    /// <summary>回避移動時間</summary>
+    private float _avoidtime = 0;
+    /// <summary>回避移動時間の制限 0.7</summary>
+    private float _avoidtimeLimit = 0.7f;
    
-
-    [SerializeField] GameObject _canvas;
+    /// <summary>ゲームオーバー時のキャンバス</summary>
+    [SerializeField] GameObject _gameOver;
 
 
     void Start()
     {
-        _mpSlider.maxValue = _maxMP;　
-        _mpSlider.value = _nowMP;
-        slider.maxValue = _maxHP;
-        slider.value = _nowHP;
+        _hpSlider.maxValue = _maxHP;
+        _hpSlider.value = _nowHP;
+        _spSlider.maxValue = _maxSP;
+        _spSlider.value = _nowSP;
         _anim = GetComponent<Animator>();
         _rb = GetComponent<Rigidbody>();
-        _attack = GameObject.Find("playerAttack2").GetComponent<BoxCollider>();　//敵にダメージを与えるコライダー
-        _attack2 = GameObject.Find("playerAttack").GetComponent<BoxCollider>();
+        _leftAttack = GameObject.Find("playerAttack2").GetComponent<BoxCollider>();　
+        _rigthAttack = GameObject.Find("playerAttack").GetComponent<BoxCollider>();
     }
 
     void Update()
@@ -65,14 +91,13 @@ public class PlayerManager : MonoBehaviour
         }
 
 
-        if (_spAction)　//関連；196
+        if (isSpAction)　
         {
-            if (Input.GetKeyDown(KeyCode.C)) //必殺技
+            if (Input.GetKeyDown(KeyCode.C)) 
             {
                 _anim.SetTrigger("attack3");
-
-                _mpSlider.value = 0f;
-                _spAction = false;
+                _spSlider.value = 0f;
+                isSpAction = false;
             }
         }
 
@@ -96,24 +121,24 @@ public class PlayerManager : MonoBehaviour
     {
         if (isGround)
         {
-            float x = Input.GetAxisRaw("Horizontal"); //移動
+            float x = Input.GetAxisRaw("Horizontal"); //矢印キー移動
             float z = Input.GetAxisRaw("Vertical");
 
-            if (Input.GetKeyDown(KeyCode.Space))  //回避判定
+            if (Input.GetKeyDown(KeyCode.Space))  
             {
-                _avoid = true;
+                isAvoid = true;
             }
 
-            if(_avoid)
+            if(isAvoid)
             {
                 _avoidtime += Time.deltaTime;
-                if(_avoidtime < 0.7f) //スペースが押された後から0.7経過
+                if(_avoidtime < _avoidtimeLimit) 
                 {
                     transform.Translate(Vector3.back * Time.deltaTime * 4.2f);　
                 }
                 else
                 {
-                    _avoid = false;
+                    isAvoid = false;
                     _avoidtime = 0f;
                 }
             }
@@ -132,11 +157,11 @@ public class PlayerManager : MonoBehaviour
             }
             if (z == 1)
             {
-                transform.rotation = Quaternion.Euler(0, 0, 0); //上
+                transform.rotation = Quaternion.Euler(0, 0, 0); //前
             }
             if (z == -1)
             {
-                transform.rotation = Quaternion.Euler(0, 180, 0); //下
+                transform.rotation = Quaternion.Euler(0, 180, 0); //後ろ
             }
             if (_rb.velocity.magnitude > 0.1f)
             {
@@ -174,101 +199,105 @@ public class PlayerManager : MonoBehaviour
 
     public void Damage(int damage)　
     {
-        slider.value = slider.value - damage;
-        if(slider.value == 0)　//HPが0の時
+        _hpSlider.value = _hpSlider.value - damage;
+        if(_hpSlider.value == 0)　//HPが0の時
         {
             Destroy(this.gameObject);　
-            _canvas.SetActive(true);　//ゲームオーバーのキャンバス表示
+            _gameOver.SetActive(true);　
         }
     }
 
     public void Sp(int sp)
     {
-        if (_spNo) //必殺技発動中はSPは0
+        if (isSpValue0) 
         {
-            _mpSlider.value = 0;
+            _spSlider.value = 0;
         }
         else
         {
-            _mpSlider.value = _mpSlider.value + sp;
-            if (_mpSlider.value == 100) //SP満タンで必殺技発動可能
+            _spSlider.value = _spSlider.value + sp;
+            if (_spSlider.value == _maxSP) 
             {
-                _spAction = true;　//行68反映
+                isSpAction = true;　
             }
         }
     }
 
-    public void Onattack()　//敵にダメージを与えるコライダー//攻撃音　を表示
+
+
+    /////////////////////  攻撃アニメーションのイベント  /////////////////////////
+    
+    public void Onattack()　
     { 
-        _attack.enabled = true;
-        _audio.enabled = true;
+        _leftAttack.enabled = true;
+        _leftaudio.enabled = true;
     }
 
-    public void Offattack()　//非表示
+    public void Offattack()　
     {
-        _attack.enabled = false;
-        _audio.enabled = false;
+        _leftAttack.enabled = false;
+        _leftaudio.enabled = false;
         
     }
 
     public void Onattack2()
     {
-        _attack2.enabled = true;
-        _audio2.enabled = true;
+        _rigthAttack.enabled = true;
+        _rigthaudio.enabled = true;
     }
 
     public void Offattack2()
     {
-        _attack2.enabled = false;
-        _audio2.enabled=false;
+        _rigthAttack.enabled = false;
+        _rigthaudio.enabled=false;
     }
 
     public void OnAudio()　//必殺技専用の音とパーティカル
     {
-        _audio.enabled = true;
+        _leftaudio.enabled = true;
     }
 
     public void OffAudio()
     {
-        _audio.enabled = false;
+        _leftaudio.enabled = false;
     }
 
     public void OnAudio2()
     {
-        _audio2.enabled = true;
+        _rigthaudio.enabled = true;
     }
 
     public void OffAudio2()
     {
-        _audio2.enabled = false;
+        _rigthaudio.enabled = false;
     }
 
     public void Oneffect()
     {
-        _effect.SetActive(true);
+        _leftPartical.SetActive(true);
     }
 
     public void Offeffect()
     {
-        _effect.SetActive(false);
+        _leftPartical.SetActive(false);
     }
 
     public void Oneffect2()
     {
-        _effect2.SetActive(true);
+        _rigthPartical.SetActive(true);
     }
 
     public void Offeffect2()
     {
-        _effect2.SetActive(false);
+        _rigthPartical.SetActive(false);
     }
 
-    public void Offsp() //必殺技
+    public void Offsp() 
     {
-        _spNo = true;
+        isSpValue0 = true;
     }
     public void Onsp()
     {
-        _spNo = false;
+        isSpValue0 = false;
     }
 }

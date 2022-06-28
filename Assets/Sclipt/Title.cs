@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+
+///////////  スタート画面から戦闘ステージに移行  //////////////
+
+
 public class Title : MonoBehaviour
 {
     // Start is called before the first frame update
@@ -21,7 +25,6 @@ public class Title : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.Space))
         {
-            Debug.Log(1);
             SceneManager.LoadScene("SampleScene");
         }
     }
