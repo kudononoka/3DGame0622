@@ -20,15 +20,15 @@ public class PlayerManager : MonoBehaviour
     /// <summary>攻撃ダメージ判定のコライダー　左手の刀に設置</summary>
     private Collider _leftAttack;
     /// <summary>攻撃ダメージ判定のコライダー　右手の刀に設置</summary>
-    private Collider _rigthAttack;
+    private Collider _rightAttack;
     /// <summary>攻撃時のパーティカル 左手</summary>
     [SerializeField] GameObject _leftPartical;
     /// <summary>攻撃時のパーティカル 右手</summary>
-    [SerializeField] GameObject _rigthPartical;
+    [SerializeField] GameObject _rightPartical;
     /// <summary>攻撃音　左手</summary>
     [SerializeField] AudioSource _leftaudio;　
     /// <summary>攻撃音　右手</summary>
-    [SerializeField] AudioSource _rigthaudio;
+    [SerializeField] AudioSource _rightaudio;
 
     //////////////////////////////////////////////////////////////////
 
@@ -71,7 +71,7 @@ public class PlayerManager : MonoBehaviour
         _anim = GetComponent<Animator>();
         _rb = GetComponent<Rigidbody>();
         _leftAttack = GameObject.Find("playerAttack2").GetComponent<BoxCollider>();　
-        _rigthAttack = GameObject.Find("playerAttack").GetComponent<BoxCollider>();
+        _rightAttack = GameObject.Find("playerAttack").GetComponent<BoxCollider>();
     }
 
     void Update()
@@ -242,14 +242,14 @@ public class PlayerManager : MonoBehaviour
 
     public void Onattack2()
     {
-        _rigthAttack.enabled = true;
-        _rigthaudio.enabled = true;
+        _rightAttack.enabled = true;
+        _rightaudio.enabled = true;
     }
 
     public void Offattack2()
     {
-        _rigthAttack.enabled = false;
-        _rigthaudio.enabled=false;
+        _rightAttack.enabled = false;
+        _rightaudio.enabled=false;
     }
 
     public void OnAudio()　//必殺技専用の音とパーティカル
@@ -264,12 +264,12 @@ public class PlayerManager : MonoBehaviour
 
     public void OnAudio2()
     {
-        _rigthaudio.enabled = true;
+        _rightaudio.enabled = true;
     }
 
     public void OffAudio2()
     {
-        _rigthaudio.enabled = false;
+        _rightaudio.enabled = false;
     }
 
     public void Oneffect()
@@ -284,12 +284,12 @@ public class PlayerManager : MonoBehaviour
 
     public void Oneffect2()
     {
-        _rigthPartical.SetActive(true);
+        _rightPartical.SetActive(true);
     }
 
     public void Offeffect2()
     {
-        _rigthPartical.SetActive(false);
+        _rightPartical.SetActive(false);
     }
 
     public void Offsp() 
